@@ -47,8 +47,8 @@ void SineSweep::Execute() {
             prev_time = time;
 
             time_angle += (dt/max_time)* cycles_per_step*_2PI;
-            motor_setpoint = amplitude*_sin(time_angle) + starting_pos;
-            motor_velocity = amplitude * _cos(time_angle);
+            motor_setpoint = 0.5*amplitude*_sin(time_angle) + starting_pos;
+            // motor_velocity = amplitude * _cos(time_angle);
 
             float angle = _motor->sensor->getAngle();
             if (angle > max_motor_angle) {
