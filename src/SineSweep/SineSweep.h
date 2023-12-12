@@ -9,10 +9,10 @@ class SineSweep {
         SineSweep();
         
         float min_frequency=10;
-        float max_frequency=200;
-        float amplitude = 0.5;
+        float max_frequency=50;
+        float amplitude = 0.1;
         float steps = 50;
-        float cycles_per_step = 50;
+        float cycles_per_step = 10;
 
         void Execute();
         void Execute(char* c);

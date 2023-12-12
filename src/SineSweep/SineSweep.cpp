@@ -3,11 +3,11 @@
 #include "SimpleFOC.h"
 
 SineSweep::SineSweep() {
-    min_frequency=5;
-    max_frequency=100;
-    amplitude = 0.1;
-    steps = 20;
-    cycles_per_step = 50;
+    // min_frequency=5;
+    // max_frequency=100;
+    // amplitude = 0.1;
+    // steps = 20;
+    // cycles_per_step = 50;
     _motor = nullptr;
 }
 
@@ -48,7 +48,7 @@ void SineSweep::Execute() {
 
             time_angle += (dt/max_time)* cycles_per_step*_2PI;
             motor_setpoint = 0.5*amplitude*_sin(time_angle) + starting_pos;
-            // motor_velocity = amplitude * _cos(time_angle);
+            motor_velocity = 0.5*amplitude * _2PI * freq* _cos(time_angle);
 
             float angle = _motor->sensor->getAngle();
             if (angle > max_motor_angle) {
