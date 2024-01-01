@@ -6,13 +6,6 @@ Kalman<1,1,4, float> Kf = Kalman<1,1,4, float>();
 void setup() {
   Serial.begin(115200);
 
-  auto I = BLA::Eye<2,2>(); 
-  auto Z = BLA::Zeros<2,2>();
-  auto R = I+Z;
-  
-  Serial.printf("%.3f, %.3f, %.3f, %.3f\n", I(0,0),I(1,0),I(0,1),I(1,1) );
-  Serial.printf("%.3f, %.3f, %.3f, %.3f\n", R(0,0),R(1,0),R(0,1),R(1,1) );
-  delay(1000);
   // mass of load, kg
   float M2 = 0.8;
   // friction for load
