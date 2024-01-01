@@ -66,7 +66,7 @@ class KalmanFilter():
 
     def set_H(self,H):
         if H is None:
-            self._H = np.zeros((self._n_states,self._n_outputs))
+            self._H = np.zeros((self._n_inputs,self._n_states))
         else:
             assert type(H) == np.ndarray
             assert H.shape[0] == self._n_inputs, f'H.shape[0] must equal n_inputs, got {H.shape[0]} expected {self._n_inputs}'
