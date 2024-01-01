@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "../../../Kalman.h"
 
- Kalman<1,1,4, float> Kf=Kalman<1,1,4, float>();
+Kalman<1,1,4, float> Kf = Kalman<1,1,4, float>();
 
 void setup() {
   Serial.begin(115200);
@@ -47,33 +47,25 @@ void setup() {
          0, 0, 0, 0.00001};
   Kf.R = { pow( 2.0f*3.14f/(pow(2.0f,14.0f)), 2.0f)};
 
-Serial.println("Starting Kalman Filter Benchmark!");
+  Serial.println("Starting Kalman Filter Benchmark!");
 }
-int j=0;
-void loop() {
-BLA::Matrix<1> z = {0.25f};
-BLA::Matrix<1> u = {0.0f};
-if (j%2==1){
-  z = {0.25f};
-  u = {0.0f};
-} else {
-  z = {0.26f};
-  u = {0.0f};
-}
-j+=1;
 
-uint32_t t_prev = micros();
-uint32_t t_start = micros();
-for (int i = 0; i<1000; i++) {
-  uint32_t t_now = micros();
-  float dt = (t_now-t_prev) * (float) 1e-6;
-  Kf.update(dt, z, u);
-  t_prev = t_now;
-}
-uint32_t t_finish = micros();
-float loop_time = (t_finish-t_start)*(float)1e-6;
-Serial.printf("Kalman Filter Loop rate: %.3fkHz - %.3fms per iteration - ", 1/loop_time, loop_time);
-Serial.printf("x_hat: %.3f, %.3f, %.3f, %.3f\n", Kf.x_hat(0),Kf.x_hat(1),Kf.x_hat(2),Kf.x_hat(3));
+void loop() {
+  BLA::Matrix<1> z = {0.25f};
+  BLA::Matrix<1> u = {0.0f};
+
+  uint32_t t_prev = micros();
+  uint32_t t_start = micros();
+  for (int i = 0; i<1000; i++) {
+    uint32_t t_now = micros();
+    float dt = (t_now-t_prev) * (float) 1e-6;
+    Kf.update(dt, z, u);
+    t_prev = t_now;
+  }
+  uint32_t t_finish = micros();
+  float loop_time = (t_finish-t_start)*(float)1e-6;
+  Serial.printf("Kalman Filter Loop rate: %.3fkHz - %.3fms per iteration - ", 1/loop_time, loop_time);
+  Serial.printf("x_hat: %.3f, %.3f, %.3f, %.3f\n", Kf.x_hat(0),Kf.x_hat(1),Kf.x_hat(2),Kf.x_hat(3));
 
 
 }
