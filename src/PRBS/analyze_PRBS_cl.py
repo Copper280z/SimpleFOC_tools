@@ -4,6 +4,8 @@
 Created on Mon Jan  8 17:51:28 2024
 
 @author: bob
+very useful slides: http://publications.pvandenhof.nl/discsysid2020/DISC-2020-7-ClosedLoop.pdf
+
 """
 
 import numpy as np
@@ -63,7 +65,8 @@ def nyquist( H ,f  , name = '' , title = 'nyquist plot'):
     plt.tight_layout()
     plt.show()
       
-filename = "screenlog.0_prbs_250k_ds10_4"
+# filename = "screenlog.0_prbs_250k_ds10_4"
+filename = "screenlog.0_cl_5"
 
 data = np.loadtxt(filename,delimiter=',')
 
@@ -77,50 +80,58 @@ plt.plot([0, data.shape[0]],[Ts, Ts])
 plt.legend(['Data','Mean'])
 plt.show()
 
-S, S_f = getFFT(data[:,1], 10, Ts)
-G, G_f = getFFT(data[:,2], 10, Ts)
-OL = G/S
+U, f = getFFT(data[:,2], 10, Ts)
+ERR, _ = getFFT(data[:,1] - data[:,3], 10, Ts)
+Y, _ = getFFT(data[:,3], 10, Ts)
+R, _ = getFFT(data[:,1], 10, Ts)
 
+C = U / ERR
+G = Y/U
+S = 1/(1+C*G)
 
 plt.figure()
-bode(S, S_f, name="Input Signal", show=False)
-bode(G, G_f, name="Response", show=False)
+bode(C, f, name="C", show=False)
+bode(G, f, name="G", show=False)
 plt.show()
 
 plt.figure()
-bode(OL, S_f, name="Encoder Frequency Response")
+bode(Y/R, f, name="y/r, Closed Loop TF")
 plt.show()
 
 plt.figure()
-nyquist(OL, S_f, name="Encoder Frequency Response")
+bode(S, f, name="Sensitivity")
+plt.show()
+
+plt.figure()
+nyquist(Y/R, f, name="Encoder Frequency Response")
 
 #%%
 '''
 Take a shot at writing the transfer function of a controller and simulating 
 the frequency reponse of the closed loop system
 '''
-s1 = signal.lti([0, 200],[500, 800, 850],200000)
-w,H = signal.freqresp(s1,w=G_f*2*np.pi) 
+s1 = signal.lti([10*2*np.pi,10*2*np.pi,10*2*np.pi,10*2*np.pi], [11*2*np.pi,11*2*np.pi,11*2*np.pi,11*2*np.pi], 1)
+w, H = signal.freqresp(s1, w=f*2*np.pi)
 
-f = w/(2*np.pi) 
+f = w/(2*np.pi)
 bode(H, f, title='Controller', name="Closed loop estimate", show=False)
 
-bode(H*OL, f, title='Closed Loop')
-nyquist(H*OL,f)
+bode(H*G, f, title='Closed Loop')
+# nyquist(H*G,f)
 
 '''
 Export data to Octave in order to fit transfer function to system.
 This is necessary because the released version of Python control does not
 currently implement the SLICOT function sb10yd, but Octave (forge) control does.
 '''
-if 1:
-    ol_filt = signal.medfilt(np.abs(OL),7) * np.exp(1j*signal.medfilt(np.angle(OL),7))
-    bode(ol_filt[7:],S_f[7:], name="Smoothed data exported for Octave")
+# if 0:
+#     ol_filt = signal.medfilt(np.abs(OL),7) * np.exp(1j*signal.medfilt(np.angle(OL),7))
+#     bode(ol_filt[7:],S_f[7:], name="Smoothed data exported for Octave")
     
-    np.savetxt("OL_f_4.csv", S_f[7:], delimiter=",")
-    with open("OL_4.csv","w") as f:
-        for num in ol_filt[7:]:
-            f.write(f"{num}".strip(")").lstrip("(")+"\n")
+#     np.savetxt("OL_f_4.csv", S_f[7:], delimiter=",")
+#     with open("OL_4.csv","w") as f:
+#         for num in ol_filt[7:]:
+#             f.write(f"{num}".strip(")").lstrip("(")+"\n")
 #%%
 
 # def model(x):
